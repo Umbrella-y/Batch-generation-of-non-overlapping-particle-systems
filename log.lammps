@@ -1,0 +1,110 @@
+LAMMPS (2 Aug 2023)
+# 读取库中包含的data文件
+shell cd output_data
+#------------------------------模型基本设置
+clear
+units metal
+dimension 3
+atom_style atomic
+atom_modify map array
+boundary p p p
+#------------------------------变量设置
+variable r1 equal floor(random(1,20,8123))
+variable r2 equal floor(random(1,20,8123))
+variable r3 equal floor(random(1,20,8123))
+variable r4 equal floor(random(1,20,8123))
+variable r5 equal floor(random(1,20,8123))
+variable r6 equal floor(random(1,20,8123))
+variable r7 equal floor(random(1,20,8123))
+variable r8 equal floor(random(1,20,8123))
+#------------------------------模型建立
+lattice fcc 3.615
+Lattice spacing in x,y,z = 3.615 3.615 3.615
+region box block -100 100 -100 100 -100 100 units box
+create_box 2 box
+Created orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+read_data random_data_${r1}.data add append shift 23.73881465156309 52.54231981522068 -47.833058974950696
+read_data random_data_16.data add append shift 23.73881465156309 52.54231981522068 -47.833058974950696
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.260 seconds
+read_data random_data_${r2}.data add append shift -29.156779744308764 -49.826527675468355 -9.308519105811385
+read_data random_data_6.data add append shift -29.156779744308764 -49.826527675468355 -9.308519105811385
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.095 seconds
+read_data random_data_${r3}.data add append shift -57.69914853930538 19.93053604348576 -33.9097542664842
+read_data random_data_10.data add append shift -57.69914853930538 19.93053604348576 -33.9097542664842
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.067 seconds
+read_data random_data_${r4}.data add append shift 57.06002398388017 -30.479610034454495 50.42758942447168
+read_data random_data_4.data add append shift 57.06002398388017 -30.479610034454495 50.42758942447168
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.066 seconds
+read_data random_data_${r5}.data add append shift -3.2182627086422286 6.61911055836093 43.62208743058392
+read_data random_data_10.data add append shift -3.2182627086422286 6.61911055836093 43.62208743058392
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.067 seconds
+read_data random_data_${r6}.data add append shift 51.43697722434945 -11.74124049525713 -61.21766671946529
+read_data random_data_1.data add append shift 51.43697722434945 -11.74124049525713 -61.21766671946529
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.070 seconds
+read_data random_data_${r7}.data add append shift 61.06986408985611 60.684759373828626 21.383106988787475
+read_data random_data_19.data add append shift 61.06986408985611 60.684759373828626 21.383106988787475
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.067 seconds
+read_data random_data_${r8}.data add append shift -61.09657926324725 -39.44992807978305 64.47191933885554
+read_data random_data_13.data add append shift -61.09657926324725 -39.44992807978305 64.47191933885554
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  5473 atoms
+  reading velocities ...
+  5473 velocities
+  read_data CPU = 0.067 seconds
+write_data test.data
+System init for write_data ...
+WARNING: Communication cutoff is 0.0. No ghost atoms will be generated. Atoms may get lost. (src/comm_brick.cpp:210)
+Total wall time: 0:00:00
