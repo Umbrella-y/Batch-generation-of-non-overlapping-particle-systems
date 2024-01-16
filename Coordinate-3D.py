@@ -141,8 +141,8 @@ def format_data_file(df, x_min, x_max, y_min, y_max, z_min, z_max, output_file):
             else:
                 file.write(" {} {} {:.6f} {:.6f} {:.6f}\n".format(atom_id, atom_type, x, y, z))
 
-data_file_list = os.listdir(r'/Volumes/新加卷/硕士毕业设计-宋梓贤/颗粒种子/8-particle-sinter/output_data')
-main_dir = '/Volumes/新加卷/硕士毕业设计-宋梓贤/颗粒种子/8-particle-sinter/'
+data_file_list = os.listdir(r'/Volumes/新加卷/xxxxx/颗粒种子/8-particle-sinter/output_data')
+main_dir = '/Volumes/新加卷/xxxxxx/颗粒种子/8-particle-sinter/'
 width = 100
 x_min = -width
 x_max = width
