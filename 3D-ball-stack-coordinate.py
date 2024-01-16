@@ -168,46 +168,79 @@ def generate_tangent_spheres(n, x_min, x_max, y_min, y_max, z_min, z_max):
                     spheres.append(sphere)
     return spheres
 
-def generate_atoms(x_min, x_max, y_min, y_max, z_min, z_max, radius):
-    # 生成8个顶角原子的坐标
-    corners = [
-        (x_min, y_min, z_min,radius), (x_min, y_min, z_max,radius), (x_min, y_max, z_min,radius), (x_min, y_max, z_max,radius),
-        (x_max, y_min, z_min,radius), (x_max, y_min, z_max,radius), (x_max, y_max, z_min,radius), (x_max, y_max, z_max,radius)
-    ]
+def simulate_ball_stack(n, box_size, radius):
+    def distance_between_balls(ball1, ball2):
+        return np.linalg.norm(ball1['position'] - ball2['position'])
+    # 设置盒子和球的参数
+    box_dimensions = np.array(box_size)
+    ball_radius = radius
+    num_balls = n
 
-    # 生成6个面心原子的坐标
-    face_centers = [
-        ((x_min + x_max) / 2, y_min, (z_min + z_max) / 2,radius),
-        ((x_min + x_max) / 2, y_max, (z_min + z_max) / 2,radius),
-        (x_min, (y_min + y_max) / 2, (z_min + z_max) / 2,radius),
-        (x_max, (y_min + y_max) / 2, (z_min + z_max) / 2,radius),
-        ((x_min + x_max) / 2, (y_min + y_max) / 2, z_min,radius),
-        ((x_min + x_max) / 2, (y_min + y_max) / 2, z_max,radius)
-    ]
+    # 初始化球的状态
+    balls = [{'position': np.random.rand(3) * box_dimensions, 'velocity': np.zeros(3)}]
 
-    return corners + face_centers
+    # 模拟过程
+    time_step = 0.01
+    gravity = np.array([0, 0, -9.8])
+    iteration = 0
+    while len(balls)< num_balls:
+        if iteration % 1000 == 0:
+            print('计算中{}'.format(iteration))
+        iteration +=1
+        # 更新球的位置和速度
+        for ball in balls:
+            ball['position'] += ball['velocity'] * time_step + 0.5 * gravity * time_step**2
+            ball['velocity'] += gravity * time_step
 
-def generate_periodic_atoms(x_min, x_max, y_min, y_max, z_min, z_max, radius):
-    # 生成8个顶角原子的坐标
-    corners = [
-        (x_min, y_min, z_max,radius), (x_min, y_max, z_min,radius), 
-        (x_max, y_min, z_min,radius), (x_max, y_max, z_max,radius)
-    ]
+            # 反弹检查
+            for i in range(3):
+                if ball['position'][i] - ball_radius < 0:
+                    ball['position'][i] = ball_radius
+                    ball['velocity'][i] = abs(ball['velocity'][i]) * 0.5
 
-    return corners 
+                if ball['position'][i] + ball_radius > box_dimensions[i]:
+                    ball['position'][i] = box_dimensions[i] - ball_radius
+                    ball['velocity'][i] = -abs(ball['velocity'][i]) * 0.5
+
+        # 碰撞检查
+        if len(balls) <= 1:
+            pass
+        else:
+            for i in range(len(balls)):
+                for j in range(len(balls)):
+                    dist = np.linalg.norm(balls[i]['position'] - balls[j]['position'])
+                    if dist < 2 * ball_radius:
+                        relative_velocity = balls[i]['velocity'] - balls[j]['velocity']
+                        normal = (balls[i]['position'] - balls[j]['position']) / dist
+
+                        balls[i]['velocity'] -= 1 * np.dot(relative_velocity, normal) * normal
+                        balls[j]['velocity'] += 1 * np.dot(relative_velocity, normal) * normal
+
+        # 生成新球
+        if len(balls) < num_balls:
+            new_ball = {'position': np.random.rand(3) * box_dimensions, 'velocity': np.zeros(3)}
+            overlapping = any(distance_between_balls(new_ball, existing_ball) < 2 * ball_radius for existing_ball in balls)
+            if not overlapping:
+                balls.append(new_ball)
+
+        # 判断结束条件
+        total_velocity_change = np.sum([np.linalg.norm(ball['velocity']) for ball in balls])
+        if total_velocity_change < 0.1 and len(balls) == num_balls:
+            break
+
+    # 输出结果
+    result = [(ball['position'][0], ball['position'][1], ball['position'][2], ball_radius) for ball in balls]
+    return result
+
+
 data_file_list = os.listdir(r'/Volumes/新加卷/硕士毕业设计-宋梓贤/颗粒种子/8-particle-sinter/output_data')
 main_dir = '/Volumes/新加卷/硕士毕业设计-宋梓贤/颗粒种子/8-particle-sinter/'
-width = 19
-x_min = -width
-x_max = width
-y_min = -width
-y_max = width
-z_min = -width
-z_max = width
-radius= 19
-number = 6
+width = 150
+box_size = [width,width,width]
+radius = 26
+number = 7
 sample_num = 10
-sintering_temperature = [300,400,500,600,700,800,900,1000] 
+sintering_temperature = [300]#,400,500,600,700,800,900,1000] 
 for sintering_temperature in sintering_temperature:
     temp_dir = str(sintering_temperature)
     os.mkdir(temp_dir)
@@ -220,7 +253,8 @@ for sintering_temperature in sintering_temperature:
     data_dir = main_dir+'/'+temp_dir
     os.system('cp -r {} {}'.format(datafile,data_dir))
     for i in range(1,sample_num+1):
-        spheres = generate_periodic_atoms(x_min, x_max, y_min, y_max, z_min, z_max,radius)
+        #spheres = generate_tangent_spheres(number, x_min, x_max, y_min, y_max, z_min, z_max)
+        spheres = simulate_ball_stack(number, box_size,radius)
         #print("球的坐标和半径:")
         #plot_spheres(spheres, x_min, x_max, y_min, y_max, z_min, z_max)
         with open ('Coordinate_list.txt', 'w') as file:
@@ -231,12 +265,9 @@ for sintering_temperature in sintering_temperature:
         os.mkdir(dirname)
         os.chdir(dirname)
         potenfile = main_dir+'/'+'Cu_mishin1.eam.alloy'
-        sbatchfile = main_dir + '/' + 'myjob.sbatch'
         poten_dir = main_dir+'/'+temp_dir+'/'+dirname
         os.system('cp {} {}'.format(potenfile,poten_dir))
         os.system('cp {} {}'.format(potenfile,data_dir))
-        if i == 1:
-           os.system('cp {} {}'.format(sbatchfile,poten_dir)) 
         with open(infilename, 'w') as file:
             file.write("# 读取库中包含的data文件\n")
             file.write("shell cd ..\n")
@@ -245,24 +276,14 @@ for sintering_temperature in sintering_temperature:
             file.write("clear\nunits metal\ndimension 3\natom_style atomic\natom_modify map array\nboundary p p p\n")
             file.write("#------------------------------变量设置\n")
             for index in range(1,len(spheres)+1):
-                file.write(f"variable r{int(index)} equal floor(random(1,20,{random.randint(1,10000)}))\n")
+                file.write("variable r{} equal floor(random(1,20,8123))\n".format(int(index)))
             file.write("#------------------------------模型建立\n")
             file.write("lattice fcc 3.615\n")
-            file.write(f"region box block -{width} {width} -{width} {width} -{width} {width} units box\n")
+            file.write(f"region box block -{width/2} {width/2} -{width/2} {width/2} -{width/2} {width/2} units box\n")
             file.write("create_box 2 box\n")
             for index, data in enumerate(spheres, start=1):
-                file.write(f"read_data random_data_${{r{index}}}.data add append shift {data[0]} {data[1]} {data[2]} group {int(index)}\n")
-                file.write(f"variable r{int(index)}_x equal xcm({int(index)},x)\n")
-                file.write(f"variable r{int(index)}_y equal xcm({int(index)},y)\n")
-                file.write(f"variable r{int(index)}_z equal xcm({int(index)},z)\n")
-                file.write(f"variable d_{int(index)}_1 equal floor(random(0,360,{random.randint(1,10000)}))\n")
-                file.write(f"variable d_{int(index)}_2 equal floor(random(0,360,{random.randint(1,10000)}))\n")
-                file.write(f"variable d_{int(index)}_3 equal floor(random(0,360,{random.randint(1,10000)}))\n")
-                file.write(f"displace_atoms {int(index)} rotate ${{r{index}_x}} ${{r{index}_y}} ${{r{index}_z}} 1 0 0 ${{d_{index}_1}} units box\n")
-                file.write(f"displace_atoms {int(index)} rotate ${{r{index}_x}} ${{r{index}_y}} ${{r{index}_z}} 0 1 0 ${{d_{index}_2}} units box\n")
-                file.write(f"displace_atoms {int(index)} rotate ${{r{index}_x}} ${{r{index}_y}} ${{r{index}_z}} 0 0 1 ${{d_{index}_3}} units box\n")
+                file.write(f"read_data random_data_${{r{index}}}.data add append shift {data[0]-width/2} {data[1]-width/2} {data[2]-width/2}\n")
             file.write("#------------------------------开始模拟\n")
-            file.write("replicate 2 2 2\n")
             file.write("variable seed1 equal floor(random(0,19991227,12393))\n")
             file.write("velocity all create 300 ${seed1} dist gaussian\n")
             file.write("neighbor 2.0 bin\n")
