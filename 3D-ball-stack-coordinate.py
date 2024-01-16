@@ -233,8 +233,8 @@ def simulate_ball_stack(n, box_size, radius):
     return result
 
 
-data_file_list = os.listdir(r'/Volumes/新加卷/硕士毕业设计-宋梓贤/颗粒种子/8-particle-sinter/output_data')
-main_dir = '/Volumes/新加卷/硕士毕业设计-宋梓贤/颗粒种子/8-particle-sinter/'
+data_file_list = os.listdir(r'/Volumes/新加卷/xxxxxx/颗粒种子/8-particle-sinter/output_data')
+main_dir = '/Volumes/新加卷/xxxxxxxxx/颗粒种子/8-particle-sinter/'
 width = 150
 box_size = [width,width,width]
 radius = 26
